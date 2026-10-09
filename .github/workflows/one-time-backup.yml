@@ -1,0 +1,60 @@
+name: One-time independent full repository backup
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+  actions: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  archive:
+    if: github.head_ref == 'development/verified-catalog'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Create complete all-ref Git mirror and bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p backup/metadata
+          git clone --mirror "https://github.com/$TARGET.git" backup/repository.git
+          git --git-dir=backup/repository.git remote remove origin
+          git --git-dir=backup/repository.git bundle create "$PWD/backup/repository-all-refs.bundle" --all
+          git --git-dir=backup/repository.git show-ref > backup/metadata/all-refs.txt
+          git --git-dir=backup/repository.git fsck --full --no-reflogs
+          git --git-dir=backup/repository.git bundle verify "$PWD/backup/repository-all-refs.bundle"
+          git --git-dir=backup/repository.git archive --format=tar.gz --prefix=master/ -o "$PWD/backup/master-files.tar.gz" refs/heads/master
+          git --git-dir=backup/repository.git archive --format=tar.gz --prefix=development/ -o "$PWD/backup/development-files.tar.gz" refs/heads/development/verified-catalog
+          if command -v git-lfs >/dev/null 2>&1; then
+            git -C backup/repository.git lfs fetch --all || echo 'WARN: optional Git LFS fetch failed' >> backup/metadata/limitations.txt
+            git -C backup/repository.git lfs ls-files --all > backup/metadata/lfs-pointers.txt || true
+          else
+            echo 'Git LFS executable unavailable; LFS pointers still in Git history' >> backup/metadata/limitations.txt
+          fi
+          for endpoint in "" "/branches" "/tags" "/releases" "/issues?state=all&per_page=100" "/pulls?state=all&per_page=100" "/labels?per_page=100" "/milestones?state=all&per_page=100" "/actions/workflows?per_page=100"; do
+            name=$(printf '%s' "$endpoint" | sed 's/[^a-zA-Z0-9]/_/g')
+            [ -n "$name" ] || name=repository
+            gh api --paginate "repos/$TARGET$endpoint" > "backup/metadata/$name.json" || echo "WARN: metadata $endpoint not readable" >> backup/metadata/limitations.txt
+          done
+          printf '%s\n' "Backup created: $(date -u +%FT%TZ)" "Repository: $TARGET" "Content: full Git mirror, bundle, master and development working-file snapshots, GitHub metadata" "GitHub secrets, deployment credentials, and external hosting state are not exportable" > backup/RESTORE-README.txt
+          printf '%s\n' "Restore: git clone repository-all-refs.bundle recovered-repository" "Restore from bare mirror: git clone repository.git working-copy" "Integrity: see SHA256SUMS and all-refs.txt" >> backup/RESTORE-README.txt
+          (cd backup; find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS)
+          tar -czf "OSINT-FULL-BACKUP-2026-10-09.tar.gz" -C backup .
+          sha256sum OSINT-FULL-BACKUP-2026-10-09.tar.gz > OSINT-FULL-BACKUP-2026-10-09.sha256
+          ls -lh OSINT-FULL-BACKUP-2026-10-09.*
+      - name: Preserve as retrievable artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: OSINT-FULL-BACKUP-2026-10-09
+          path: |
+            OSINT-FULL-BACKUP-2026-10-09.tar.gz
+            OSINT-FULL-BACKUP-2026-10-09.sha256
+          if-no-files-found: error
+          retention-days: 90
