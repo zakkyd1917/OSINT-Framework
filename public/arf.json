@@ -17140,10 +17140,10 @@
                 {
                   "name": "Print Storyboard from Youtube",
                   "type": "url",
-                  "url": "javascript:(function(){a=ytplayer.config.args.storyboard_spec;if(!a){alert(\"Sorry we cannot process this YouTube video. Could you please try another one\");exit();}b=a.split(\"|\");base=b[0].split(\"$\")[0]+\"2/M\";c=b[3].split(\"%23\");sigh=c[c.length-1];var imgs=\"\";t=ytplayer.config.args.length_seconds;n=Math.ceil(c[2]/(c[3]*c[4]));for(i=0;i<n;i++){imgs+=\"<PICTURE='\"+base+i+\".jpg%3Fsigh=\"+sigh+\"'><br/>\";}var title=ytplayer.config.args.title;msg=\"<body style='background-color:#444;color:#eee;margin:20px%20auto;width:90%;text-align:center'%3E%3Ch2%3ETITLE%3C/h2%3E%3Cdiv%3EIMAGES%3C/div%3E%3Cbr/%3E%3Cem%3E%3Ca%20href='http://labnol.org/?p=28217'%20style='text-decoration:none;color:#fff;font-style:bold'%3EPrinted%20using%20the%20YouTube%20bookmarklet.%3C/a%3E%3C/em%3E%3C/body%3E%22;msg=msg.replace(%22TITLE%22,title).replace(%22IMAGES%22,imgs).replace(/PICTURE/g,%22img%20src%22);var%20labnol=window.open();labnol.document.open();labnol.document.write(msg);labnol.document.close();})();",
-                  "catalogId": "osint-7a8ad3d0",
-                  "lifecycle": "unassessed",
-                  "status": "unverified",
+                  "url": "https://www.labnol.org/internet/print-youtube-video/28217",
+                  "catalogId": "osint-nonexecuting-bookmarklet-review",
+                  "lifecycle": "legacy",
+                  "status": "restricted",
                   "description": "Description pending independent assessment; do not infer functionality from link availability.",
                   "verification": {
                     "lastChecked": null,
@@ -17165,11 +17165,12 @@
                     "confidence": "none"
                   },
                   "jsAssessment": {
-                    "requiresJavaScript": null,
-                    "review": "not_assessed",
-                    "policy": "avoid_js_execution",
+                    "requiresJavaScript": true,
+                    "review": "replacement_required",
+                    "policy": "do_not_execute",
                     "exceptionApproved": false
-                  }
+                  },
+                  "editorialCaution": "Removed executable bookmarklet URL. Archive access remains in the preserved snapshot; use a non-executing alternative."
                 },
                 {
                   "name": "Frame by Frame for YouTube (T)",
@@ -58454,12 +58455,15 @@
             "notes": "New resource candidate; verification pending."
           },
           "access": {
-            "costModel": "unassessed",
-            "freeUsability": "unassessed",
-            "registration": "unassessed",
-            "payment": "unassessed",
-            "humanEffort": "unassessed",
-            "confidence": "none"
+            "costModel": "free_public_data",
+            "freeUsability": "public_download",
+            "registration": "not_required_for_public_download",
+            "payment": "not_required_for_GDELT_data",
+            "humanEffort": "substantial_data_cleaning_and_bias_assessment",
+            "confidence": "high",
+            "reviewedAt": "2026-10-09",
+            "source": "https://gdeltproject.org/about.html",
+            "notes": "Open raw datasets; third-party compute tools or BigQuery processing may have separate costs."
           },
           "jsAssessment": {
             "requiresJavaScript": null,
@@ -58578,12 +58582,15 @@
             "notes": "New resource candidate; verification pending."
           },
           "access": {
-            "costModel": "unassessed",
-            "freeUsability": "unassessed",
-            "registration": "unassessed",
+            "costModel": "terms_dependent",
+            "freeUsability": "registration_required",
+            "registration": "required_for_api_and_downloads",
             "payment": "unassessed",
-            "humanEffort": "unassessed",
-            "confidence": "none"
+            "humanEffort": "account_setup_api_authentication_and_methodology_review",
+            "confidence": "high_for_registration",
+            "reviewedAt": "2026-10-09",
+            "source": "https://acleddata.com/api-documentation/getting-started",
+            "notes": "Requires myACLED account; API programmatic requests require authentication."
           },
           "jsAssessment": {
             "requiresJavaScript": null,
@@ -58702,12 +58709,15 @@
             "notes": "New resource candidate; verification pending."
           },
           "access": {
-            "costModel": "unassessed",
-            "freeUsability": "unassessed",
-            "registration": "unassessed",
-            "payment": "unassessed",
-            "humanEffort": "unassessed",
-            "confidence": "none"
+            "costModel": "metered_free_quota",
+            "freeUsability": "anonymous_budget_0.10_USD_per_day_or_free_account_1.00_USD_per_day",
+            "registration": "optional_for_small_use",
+            "payment": "required_only_above_free_budget",
+            "humanEffort": "query_design_and_result_validation",
+            "confidence": "high",
+            "reviewedAt": "2026-10-09",
+            "source": "https://help.openalex.org/access/pricing/",
+            "notes": "Keyless and free-key budgets are usage-based and may change; not a blanket unlimited-free API."
           },
           "jsAssessment": {
             "requiresJavaScript": null,
