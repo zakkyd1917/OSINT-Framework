@@ -1,0 +1,58 @@
+name: Evidence-backed resource observations
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: Number of unique HTTPS source endpoints to observe
+        required: false
+        default: '90'
+  schedule:
+    - cron: '17 6,18 * * *'
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: source-observations
+  cancel-in-progress: false
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Unit tests without external probes
+        run: python3 -m unittest discover -s tests -v
+      - name: Observe rotating sample, no JavaScript
+        env:
+          BATCH_SIZE: ${{ github.event.inputs.batch_size || '90' }}
+        run: python3 tools/verify_sources.py --batch-size "$BATCH_SIZE"
+      - name: Alert only on repeated missing responses
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python3 tools/alert_exceptions.py
+      - name: Rebuild static directory
+        run: python3 tools/build_static_catalog.py
+      - name: Preserve evidence and state
+        run: |
+          git config user.name "osint-evidence-bot"
+          git config user.email "osint-evidence-bot@users.noreply.github.com"
+          git add evidence/state.json evidence/latest.json evidence/exceptions.json public/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Evidence: bounded HTTPS observations [skip ci]"
+            git push
+          fi
+      - name: Preserve recent observation records
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-observations-${{ github.run_id }}
+          path: |
+            evidence/latest.json
+            evidence/exceptions.json
+          retention-days: 30
