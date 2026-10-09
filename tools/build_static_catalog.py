@@ -7,6 +7,7 @@ import pathlib
 from urllib.parse import urlsplit
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+STATE = {}
 FILE = ROOT / "public" / "index.html"
 
 CSS = """
@@ -42,7 +43,7 @@ def render(node):
     # Do not generate clickable non-HTTPS or executable bookmarklets.
     link = ('<a href="'+e(url)+'" rel="noopener noreferrer" target="_blank">'+e(node.get("name"))+"</a>"
             if kind == "https" else e(node.get("name")) + " (manual review required)")
-    observed = node.get("verification",{}).get("lastChecked") or "not independently checked"
+    observed = STATE.get(url,{}).get("lastCheckedAt") or node.get("verification",{}).get("lastChecked") or "not independently checked"
     access = node.get("access",{})
     cost = access.get("costModel","unassessed")
     return ('<article class="tool"><div class="name">'+link+'</div>'
@@ -52,7 +53,10 @@ def render(node):
             +('<p class="description"><strong>Caution:</strong> '+e(node.get("editorialCaution"))+'</p>'
               if node.get("editorialCaution") else "")+"</article>")
 def main():
+    global STATE
     root=json.loads((ROOT/"public"/"arf.json").read_text(encoding="utf-8"))
+    state_path = ROOT/"evidence"/"state.json"
+    STATE = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
     cats=root.get("children",[])
     nav="".join('<a href="#'+name_id(x["name"])+'">'+e(x["name"])+"</a>" for x in cats)
     content="".join('<section id="'+name_id(x["name"])+'"><h2>'+e(x["name"])+'</h2>'
@@ -68,7 +72,7 @@ def main():
           'proof of functionality, accuracy, affordability, anonymity, or fitness for '
           'investigative use. Use browser Find to search this static directory.</p>'
           '<nav aria-label="Categories">'+nav+'</nav>'+content
-          '<footer><small>MIT-licensed code and data adaptations retain original '
+          +'<footer><small>MIT-licensed code and data adaptations retain original '
           'license notices. See the repository license for attribution.</small></footer>'
           '</main></body></html>')
     FILE.write_text(page,encoding="utf-8")
