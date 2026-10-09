@@ -26,6 +26,17 @@ jobs:
         run: python3 -m unittest discover -s tests -v
       - name: Check generic-input API profiles without network access
         run: python3 tools/functional_probe.py --dry-run
+      - name: Validate reproducible Cloudflare Worker generation
+        run: |
+          python3 tools/build_edge_worker.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('dist/worker.mjs').read_text(encoding='utf8')
+          assert "raw.githubusercontent.com/zakkyd1917/OSINT-Framework/master/public/index.html" in p
+          assert "script-src 'none'" in p
+          assert "EMBEDDED_HTML" in p
+          print('Edge fallback and no-client-JavaScript policy configured')
+          PY
       - name: Generate JavaScript-free catalog
         run: |
           python3 tools/build_static_catalog.py
