@@ -24,6 +24,8 @@ jobs:
         run: python3 -m json.tool public/arf.json > /dev/null
       - name: Offline unit tests
         run: python3 -m unittest discover -s tests -v
+      - name: Check generic-input API profiles without network access
+        run: python3 tools/functional_probe.py --dry-run
       - name: Generate JavaScript-free catalog
         run: |
           python3 tools/build_static_catalog.py
