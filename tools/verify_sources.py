@@ -195,7 +195,14 @@ def observe(entry):
     except ValueError as exc:
         result["observation"] = "not_probed_by_policy"
         result["exception"] = str(exc)
-    except (urllib.error.URLError, TimeoutError, OSError, ConnectionError):
+    except urllib.error.URLError as exc:
+        if isinstance(exc.reason, ssl.SSLError):
+            result["observation"] = "tls_validation_failed"
+            result["exception"] = "tls_error"
+        else:
+            result["observation"] = "network_inconclusive"
+            result["exception"] = "network_error"
+    except (TimeoutError, OSError, ConnectionError):
         result["observation"] = "network_inconclusive"
         result["exception"] = "network_error"
     except Exception as exc:
