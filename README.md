@@ -41,6 +41,20 @@ It stores dated evidence, regenerates a static directory, and issues targeted
 GitHub review alerts only for repeated 404/410 observations. Public forks may
 start with scheduled workflows disabled. Actions require manual enablement.
 
+## Cloudflare live deployment
+
+The independent static catalog is published at https://osint-evidence-catalog.cca-records.workers.dev/ using a dedicated Worker. It contains no browser-side JavaScript, no site cookies, no advertising scripts and no remote fonts. An edge-only script retrieves the **owner-controlled** GitHub master static HTML on a three-hour cache and falls back to an embedded copy if GitHub is unavailable. No upstream maintainer or third-party catalog is consulted. The existing `wrangler.jsonc` supports static-asset-only deployments; for the resilient Worker use `wrangler-edge.jsonc`.
+
+Reproducible deployment:
+
+    python3 tools/build_static_catalog.py
+    python3 tools/build_edge_worker.py
+    npx wrangler deploy --config wrangler-edge.jsonc
+
+The independent Worker currently deploys from the connected Cloudflare account. Automated catalog observations happen through GitHub Actions. Successful evidence changes propagate to Cloudflare after its cache refresh interval, without GitHub requiring a Cloudflare secret.
+
+The repository Homepage setting may still display the original project URL; update it in GitHub Settings when convenient to the new Worker URL. This is metadata, not a network dependency.
+
 ## No browser JavaScript
 
 The default public/index.html is a static HTML directory with no executable
