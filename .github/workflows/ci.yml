@@ -1,12 +1,6 @@
 name: Static catalog and quality checks
 
 on:
-  push:
-    branches: [master, 'development/**']
-    paths-ignore:
-      - 'evidence/latest.json'
-      - 'evidence/exceptions.json'
-      - 'evidence/state.json'
   pull_request:
     branches: [master]
   workflow_dispatch:
