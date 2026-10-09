@@ -1,0 +1,9 @@
+{
+  "name": "osint-evidence-catalog",
+  "main": "dist/worker.mjs",
+  "compatibility_date": "2026-10-09",
+  "workers_dev": true,
+  "observability": {
+    "enabled": false
+  }
+}
