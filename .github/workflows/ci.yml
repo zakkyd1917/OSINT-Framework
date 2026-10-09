@@ -3,6 +3,13 @@ name: Static catalog and quality checks
 on:
   pull_request:
     branches: [master]
+    paths:
+      - 'public/arf.json'
+      - 'public/index.html'
+      - 'tools/**'
+      - 'tests/**'
+      - '.github/workflows/**'
+      - 'wrangler.jsonc'
   workflow_dispatch:
 
 permissions:
