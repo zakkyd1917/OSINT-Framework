@@ -29,3 +29,6 @@ Thumbs.db
 !.dev.vars.example
 .env*
 !.env.example
+
+# reproducible edge bundle (generated from public/index.html)
+dist/
