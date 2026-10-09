@@ -1,88 +1,67 @@
-# OSINT Framework
+# OSINT Evidence Catalog
 
-http://osintframework.com
+An independent, static, evidence-led directory of open-source research resources.
+The index is NOT a certification that resources work or that their data is accurate.
 
-## Notes
-OSINT framework focused on gathering information from free tools or resources. The intention is to help people find free OSINT resources. Some of the sites included might require registration or offer more data for $$$, but you should be able to get at least a portion of the available information for no cost.
+## Provenance and classification
 
-I originally created this framework with an information security point of view. Since then, the response from other fields and disciplines has been incredible. I would love to be able to include any other OSINT resources, especially from fields outside of infosec. Please let me know about anything that might be missing!
+- claimedStatus, claimedPricing and claimedOpsec preserve inherited assertions, not independent verification.
+- status identifies the editorial lifecycle: unverified, monitoring, historical or retired.
+- evidence/ records transport observations, never service functionality guarantees.
+- access separates price, practical free-tier usefulness, registration, payment and human effort.
+- jsAssessment identifies potential JavaScript requirements and exceptional-value reviews.
+- catalogId links recurring resource destinations across different research categories.
 
-Please visit the framework at the link below and good hunting!
+Previously abandoned URLs are retained with historical labels or monitoring flags.
+Nothing is removed just because a network checker encounters an error.
 
-https://osintframework.com
+## TLS-verified, non-executing monitoring
 
-### Legend
+Run these commands from the repository root:
 
-#### Name Markers
-(T) - Indicates a link to a tool that must be installed and run locally
-(D) - Google Dork, for more information: <a href="https://en.wikipedia.org/wiki/Google_hacking">Google Hacking</a>
-(R) - Requires registration
-(M) - Indicates a URL that contains the search term and the URL itself must be edited manually
+    python3 -m unittest discover -s tests -v
+    python3 tools/build_static_catalog.py
+    python3 tools/verify_sources.py --dry-run --batch-size 20
+    python3 tools/verify_sources.py --batch-size 20
 
-#### Tool Metadata Fields
-Each tool entry in `arf.json` can include structured metadata beyond the name and URL:
+The checker makes GET requests against public HTTPS endpoints only. It uses
+certificate verification, the operating-system trust store, TLS 1.2 minimum,
+and negotiates TLS 1.3 when supported. It never executes JavaScript, submits
+forms, authenticates to target services, follows redirects to insecure or
+internal addresses, or accepts self-signed/invalid certificates.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `description` | string | What the tool does |
-| `status` | string | `live`, `degraded`, `down`, or `deprecated` |
-| `pricing` | string | `free`, `freemium`, or `paid` |
-| `bestFor` | string | Primary use case in one line |
-| `input` | string | What the tool takes as input |
-| `output` | string | What the tool returns |
-| `opsec` | string | `passive` or `active` |
-| `opsecNote` | string | Operational security considerations |
-| `localInstall` | boolean | Corresponds to `(T)` marker |
-| `googleDork` | boolean | Corresponds to `(D)` marker |
-| `registration` | boolean | Corresponds to `(R)` marker |
-| `editUrl` | boolean | Corresponds to `(M)` marker |
-| `api` | boolean | Whether the tool offers an API |
-| `invitationOnly` | boolean | Whether access requires an invitation |
-| `deprecated` | boolean | Whether the tool is deprecated |
+An HTTP 200 response is transport evidence, not a completed functional test.
+HTTP 403/429, TLS errors, timeouts, and captive-login pages are inconclusive.
+Repeated HTTP 404/410 observations six or more hours apart can create a review
+issue, but cannot delete a resource. See evidence/README.md for details.
 
-### For Update Notifications
-Follow me on Twitter: @jnordine - https://twitter.com/jnordine  
-Watch or star the project on Github: https://github.com/lockfale/osint-framework
+Once promoted to the default branch and GitHub Actions is enabled, the
+verify-sources workflow cycles through 90 destinations every 12 hours.
+It stores dated evidence, regenerates a static directory, and issues targeted
+GitHub review alerts only for repeated 404/410 observations. Public forks may
+start with scheduled workflows disabled. Actions require manual enablement.
 
-### Suggestions, Comments, Feedback
-Feedback or new tool suggestions are extremely welcome!  Please feel free to submit a pull request or open an issue on github or reach out on Twitter.
+## No browser JavaScript
 
-### Contribute with a GitHub Pull Request
-For new resources, please ensure that the site is available for public and free use.
+The default public/index.html is a static HTML directory with no executable
+JavaScript, remote stylesheets, tracking pixels, browser storage, or cookies.
+The previous interactive app and Worker are not prerequisites. The source
+inventory remains ordinary readable JSON.
 
-1. Update `arf.json` with your new tool entry in the appropriate category folder. Use the enriched format below:
+## Independence and required attribution
 
-```json
-{
-  "name": "Example Name (T)",
-  "type": "url",
-  "url": "https://example.com",
-  "description": "Brief description of what the tool does and its key capabilities.",
-  "status": "live",
-  "pricing": "free",
-  "bestFor": "Primary use case in one sentence",
-  "input": "What the tool accepts (e.g., Username, Domain, IP address)",
-  "output": "What the tool returns (e.g., Profile matches, DNS records)",
-  "opsec": "passive",
-  "opsecNote": "Any operational security considerations for using this tool.",
-  "localInstall": true,
-  "googleDork": false,
-  "registration": false,
-  "editUrl": false,
-  "api": false,
-  "invitationOnly": false,
-  "deprecated": false
-}
-```
+This code and directory derive from software published under the MIT License.
+The original LICENSE notice remains intact as legally required.
+The new tooling does not write to, synchronize with, or call any other user's
+GitHub repository, service domain, or application.
 
-At a minimum, include `name`, `type`, and `url`. The metadata fields are strongly encouraged as they help users understand each tool at a glance.
+GitHub still records this repository as a fork until an administrator uses
+Settings > General > Danger Zone > Leave fork network. That platform-level
+operation is separate from application code and cannot be performed by this
+connected tool set. Do not delete the fork as a substitute for detaching it.
 
-Append `(T)`, `(D)`, `(R)`, or `(M)` to the name when applicable, and set the corresponding boolean field to `true`.
+Original master is preserved at:
+archive/pre-independence-2026-10-09
 
-2. Submit your pull request!
-
-## OSINT Framework Website
-
-https://osintframework.com
-
-Happy Hunting!
+Work in progress:
+development/verified-catalog

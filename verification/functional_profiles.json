@@ -1,0 +1,32 @@
+{
+  "profiles": [
+    {
+      "name": "OpenAlex",
+      "testUrl": "https://api.openalex.org/works?search=geography&per_page=1",
+      "expectedJsonKeys": [
+        "meta",
+        "results"
+      ],
+      "genericInput": "geography",
+      "note": "Keyless public metadata query, only 1 record; rate-limited."
+    },
+    {
+      "name": "Crossref",
+      "testUrl": "https://api.crossref.org/works?query.title=climate&rows=1",
+      "expectedJsonKeys": [
+        "message"
+      ],
+      "genericInput": "climate",
+      "note": "Public metadata query. API output is metadata, not confirmation of scholarly reliability."
+    },
+    {
+      "name": "Wikidata",
+      "testUrl": "https://www.wikidata.org/w/api.php?action=query&meta=siteinfo&format=json",
+      "expectedJsonKeys": [
+        "query"
+      ],
+      "genericInput": "siteinfo",
+      "note": "Public service metadata query; not an identity or fact-verification test."
+    }
+  ]
+}
