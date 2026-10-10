@@ -1,6 +1,9 @@
 # OSINT Evidence Catalog
 
 An independent, static, evidence-led directory of open-source research resources.
+
+**Official catalog:** https://osint-evidence-catalog.cca-records.workers.dev/
+
 The index is NOT a certification that resources work or that their data is accurate.
 
 ## Provenance and classification
@@ -53,7 +56,7 @@ Reproducible deployment:
 
 The independent Worker currently deploys from the connected Cloudflare account. Automated catalog observations happen through GitHub Actions. Successful evidence changes propagate to Cloudflare after its cache refresh interval, without GitHub requiring a Cloudflare secret.
 
-The repository Homepage setting may still display the original project URL; update it in GitHub Settings when convenient to the new Worker URL. This is metadata, not a network dependency.
+The official catalog link is the owner-controlled Cloudflare Worker above. The GitHub repository homepage field is managed separately in **Settings > General**, and must be set to that URL. No original-project URL should be presented as this repository's official homepage.
 
 ## No browser JavaScript
 
