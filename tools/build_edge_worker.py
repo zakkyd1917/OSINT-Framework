@@ -28,7 +28,7 @@ async function catalogHtml() {
   try {
     const upstream = await fetch(OWN_SOURCE, {
       headers: {'Accept': 'text/html'},
-      cf: {cacheEverything: true, cacheTtl: 10800}
+      cf: {cacheEverything: true, cacheTtl: 129600}
     });
     if (upstream.ok && Number(upstream.headers.get('content-length') || 0) < 1500000) {
       const value = await upstream.text();
