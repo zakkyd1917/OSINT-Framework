@@ -52,16 +52,7 @@ jobs:
           PY
       - name: Rebuild static directory
         run: python3 tools/build_static_catalog.py
-      - name: Preserve evidence and state
-        run: |
-          git config user.name "osint-evidence-bot"
-          git config user.email "osint-evidence-bot@users.noreply.github.com"
-          git add evidence/state.json evidence/latest.json evidence/exceptions.json evidence/functional_latest.json public/index.html
-          if ! git diff --cached --quiet; then
-            git commit -m "Evidence: bounded HTTPS observations [skip ci]"
-            git push
-          fi
-      - name: Preserve recent observation records
+      - name: Preserve observation artifacts before attempting to push
         uses: actions/upload-artifact@v4
         with:
           name: source-observations-${{ github.run_id }}
@@ -69,4 +60,34 @@ jobs:
             evidence/latest.json
             evidence/exceptions.json
             evidence/functional_latest.json
+            evidence/state.json
+          if-no-files-found: error
           retention-days: 30
+      - name: Commit evidence with bounded conflict-safe retry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "osint-evidence-bot"
+          git config user.email "osint-evidence-bot@users.noreply.github.com"
+          git add evidence/state.json evidence/latest.json evidence/exceptions.json evidence/functional_latest.json public/index.html
+          if git diff --cached --quiet; then
+            echo "No evidence changes to publish."
+            exit 0
+          fi
+          git commit -m "Evidence: bounded HTTPS observations [skip ci]"
+          for attempt in 1 2 3; do
+            git fetch origin master
+            if ! git rebase origin/master; then
+              git rebase --abort || true
+              echo "::error::Evidence commit conflicted with newer catalog changes. Observation artifact is preserved; manual reconciliation required."
+              exit 1
+            fi
+            if git push origin HEAD:master; then
+              echo "Evidence published in attempt $attempt"
+              exit 0
+            fi
+            echo "Concurrent update detected; retrying without force ($attempt/3)"
+            sleep $((attempt * 4))
+          done
+          echo "::error::Evidence was not pushed after three safe attempts; artifacts are available."
+          exit 1
