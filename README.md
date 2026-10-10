@@ -56,7 +56,7 @@ Reproducible deployment:
 
 The independent Worker currently deploys from the connected Cloudflare account. Automated catalog observations happen through GitHub Actions. Successful evidence changes propagate to Cloudflare after its cache refresh interval, without GitHub requiring a Cloudflare secret.
 
-The official catalog link is the owner-controlled Cloudflare Worker above. The GitHub repository homepage field is managed separately in **Settings > General**, and must be set to that URL. No original-project URL should be presented as this repository's official homepage.
+The official catalog link is the owner-controlled Cloudflare Worker above. The GitHub repository homepage field is managed separately through the repository's **About** panel (gear icon > **Website**), and must be set to that URL. No original-project URL should be presented as this repository's official homepage.
 
 ## No browser JavaScript
 
