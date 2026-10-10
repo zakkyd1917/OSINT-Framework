@@ -46,7 +46,7 @@ start with scheduled workflows disabled. Actions require manual enablement.
 
 ## Cloudflare live deployment
 
-The independent static catalog is published at https://osint-evidence-catalog.cca-records.workers.dev/ using a dedicated Worker. It contains no browser-side JavaScript, no site cookies, no advertising scripts and no remote fonts. An edge-only script retrieves the **owner-controlled** GitHub master static HTML on a three-hour cache and falls back to an embedded copy if GitHub is unavailable. No upstream maintainer or third-party catalog is consulted. The existing `wrangler.jsonc` supports static-asset-only deployments; for the resilient Worker use `wrangler-edge.jsonc`.
+The independent static catalog is published at https://osint-evidence-catalog.cca-records.workers.dev/ using a dedicated Worker. It contains no browser-side JavaScript, no site cookies, no advertising scripts and no remote fonts. An edge-only script retrieves the **owner-controlled** GitHub master static HTML with a 36-hour edge cache (refreshed on a visitor request after expiry) and falls back to an embedded copy if GitHub is unavailable. No upstream maintainer or third-party catalog is consulted. The existing `wrangler.jsonc` supports static-asset-only deployments; for the resilient Worker use `wrangler-edge.jsonc`.
 
 Reproducible deployment:
 
@@ -54,7 +54,7 @@ Reproducible deployment:
     python3 tools/build_edge_worker.py
     npx wrangler deploy --config wrangler-edge.jsonc
 
-The independent Worker currently deploys from the connected Cloudflare account. Automated catalog observations happen through GitHub Actions. Successful evidence changes propagate to Cloudflare after its cache refresh interval, without GitHub requiring a Cloudflare secret.
+The independent Worker currently deploys from the connected Cloudflare account. Automated catalog observations happen through GitHub Actions. Successful evidence changes propagate to Cloudflare when a subsequent request refreshes its 36-hour edge cache, without GitHub requiring a Cloudflare secret.
 
 The official catalog link is the owner-controlled Cloudflare Worker above. The GitHub repository homepage field is managed separately through the repository's **About** panel (gear icon > **Website**), and must be set to that URL. No original-project URL should be presented as this repository's official homepage.
 
